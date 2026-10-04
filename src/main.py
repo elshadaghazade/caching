@@ -8,8 +8,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import engine, get_db
-from src.schemas import PayloadCreateResponse, PayloadRequest
-from src.services import cache_payload
+from src.schemas import PayloadCreateResponse, PayloadRequest, TransformsResponse
+from src.services import cache_payload, get_payload
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,3 +48,14 @@ async def post_payload(
     pid = await cache_payload(session, body)
     await session.commit()
     return PayloadCreateResponse(id=pid)
+
+
+@app.get("/{id}", response_model=TransformsResponse, status_code=200)
+async def retrieve_payload(id: int, session: AsyncSession = Depends(get_db)) -> TransformsResponse:
+    """Retrieves transformed strings by their id"""
+    output = await get_payload(
+        session=session,
+        id=id
+    )
+    await session.commit()
+    return TransformsResponse(output=output)
