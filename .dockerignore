@@ -1,0 +1,13 @@
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.git
+.gitignore
+.dockerignore
+.python-version
+Dockerfile
+infra
+scripts
+tests
+main.py
