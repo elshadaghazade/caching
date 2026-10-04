@@ -1,11 +1,15 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 import logging
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import Body, Depends, FastAPI
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db import engine
+from src.db import engine, get_db
+from src.schemas import PayloadCreateResponse, PayloadRequest
+from src.services import cache_payload
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,3 +37,14 @@ app = FastAPI(
     description="Interleaves and caches transformed string lists.",
     lifespan=lifespan,
 )
+
+
+@app.post("/payload", response_model=PayloadCreateResponse, status_code=201)
+async def post_payload(
+    body: Annotated[PayloadRequest, Body(min_length=1)],
+    session: AsyncSession = Depends(get_db),
+) -> PayloadCreateResponse:
+    """Transform and cache the payload. Returns its id for later retrieval."""
+    pid = await cache_payload(session, body)
+    await session.commit()
+    return PayloadCreateResponse(id=pid)
