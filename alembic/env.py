@@ -7,6 +7,7 @@ from sqlalchemy.engine.url import make_url
 from alembic import context
 
 from src.db import DATABASE_URL, Base
+from src import models  # noqa: F401
 
 config = context.config
 
