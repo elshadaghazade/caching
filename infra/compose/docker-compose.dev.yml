@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cache-dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cache
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cache}
+      POSTGRES_DB: cache
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - cache-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cache -d cache"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  cache-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: cache-dev-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://cache:${POSTGRES_PASSWORD:-cache}@postgres:5432/cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - cache-net
+
+networks:
+  cache-net:
+    driver: bridge
+    name: cache-dev-net
+
+volumes:
+  postgres_data:
+    name: cache-dev-postgres-data
