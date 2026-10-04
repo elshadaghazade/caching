@@ -31,3 +31,15 @@ class ListCache(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class Transforms(Base):
+    """One row per cached request: a deduplicated set of transformed strings."""
+
+    __tablename__ = "transforms"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    transforms: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
