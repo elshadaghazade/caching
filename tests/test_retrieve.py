@@ -13,7 +13,7 @@ def test_retrieve_payload_happy_path(mock_get):
     app.dependency_overrides[get_db] = lambda: session
     try:
         client = TestClient(app)
-        response = client.get("/1")
+        response = client.get("/payload/1")
         assert response.status_code == 200
         assert response.json() == {"output": "FIRST, SECOND, THIRD"}
         mock_get.assert_awaited_once()
@@ -28,7 +28,7 @@ def test_retrieve_payload_passes_id_to_service(mock_get):
     app.dependency_overrides[get_db] = lambda: session
     try:
         client = TestClient(app)
-        response = client.get("/42")
+        response = client.get("/payload/42")
         assert response.status_code == 200
         _, kwargs = mock_get.call_args
         assert kwargs["session"] is session
@@ -44,7 +44,7 @@ def test_retrieve_payload_rejects_non_int(mock_get):
     app.dependency_overrides[get_db] = lambda: session
     try:
         client = TestClient(app)
-        response = client.get("/not-an-int")
+        response = client.get("/payload/not-an-int")
         assert response.status_code == 422
         mock_get.assert_not_awaited()
     finally:
@@ -58,7 +58,7 @@ def test_retrieve_payload_empty_output(mock_get):
     app.dependency_overrides[get_db] = lambda: session
     try:
         client = TestClient(app)
-        response = client.get("/7")
+        response = client.get("/payload/7")
         assert response.status_code == 200
         assert response.json() == {"output": ""}
     finally:
