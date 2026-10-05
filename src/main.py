@@ -50,7 +50,7 @@ async def post_payload(
     return PayloadCreateResponse(id=pid)
 
 
-@app.get("/{id}", response_model=TransformsResponse, status_code=200)
+@app.get("/payload/{id}", response_model=TransformsResponse, status_code=200)
 async def retrieve_payload(id: int, session: AsyncSession = Depends(get_db)) -> TransformsResponse:
     """Retrieves transformed strings by their id"""
     output = await get_payload(
