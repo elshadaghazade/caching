@@ -23,7 +23,7 @@ curl -s -X POST http://localhost:8000/payload \
 # → {"id": 1, "message": "payload created"}
 
 # Read it later by id
-curl -s http://localhost:8000/1
+curl -s http://localhost:8000/payload/1
 # → {"output": "FOO, BAR, QUX"}
 ```
 
